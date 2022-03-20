@@ -1,17 +1,16 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const { update } = require("../models/song");
 const router = express.Router();
 const Song = require("../models/song");
 
 // GET routes
 router.get("/", (req, res, next) => {
   Song.find({})
-    .then((result) => {
+    .then((songList) => {
       // console.log(result);
       res.status(200).json({
-        song: {
-          title: result.title,
-        },
+        songList,
       });
     })
     .catch((err) => {
@@ -33,6 +32,7 @@ router.get("/:songId", (req, res, next) => {
       song: {
         title: result.title,
         artist: result.artist,
+        album: result.album,
         id: result._id,
       },
     });
@@ -45,6 +45,7 @@ router.post("/", (req, res, next) => {
     _id: mongoose.Types.ObjectId(),
     title: req.body.title,
     artist: req.body.artist,
+    album: req.body.album,
   });
 
   newSong
@@ -53,14 +54,10 @@ router.post("/", (req, res, next) => {
       console.log(result);
       res.status(200).json({
         message: "Song submitted",
-        song: {
-          title: result.title,
-          artist: result.artist,
-          id: result._id,
-          metadata: {
-            method: req.method,
-            host: req.hostname,
-          },
+        result,
+        metadata: {
+          method: req.method,
+          host: req.hostname,
         },
       });
     })
@@ -81,16 +78,19 @@ router.patch("/:songId", (req, res, next) => {
   const updateSong = {
     title: req.body.title,
     artist: req.body.artist,
+    album: req.body.album,
   };
 
   Song.updateOne({ _id: songId }, { $set: updateSong })
     .then((result) => {
       res.status(200).json({
         message: "Song updated",
+        result,
         song: {
-          title: result.title,
-          artist: result.artist,
-          id: result._id,
+          title: updateSong.title,
+          artist: updateSong.artist,
+          album: updateSong.album,
+          id: songId,
         },
         metadata: {
           method: req.method,
@@ -110,7 +110,13 @@ router.patch("/:songId", (req, res, next) => {
 // DELETE route
 router.delete("/:songId", (req, res, next) => {
   const songId = req.params.songId;
-  res.json({
+
+  const deleteSong = {
+    title: req.body.title,
+    artist: req.body.artist,
+    album: req.body.album,
+  };
+  Song.res.json({
     message: "Song - DELETE",
     id: songId,
   });
