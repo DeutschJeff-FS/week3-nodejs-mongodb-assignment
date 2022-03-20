@@ -1,6 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const { update } = require("../models/song");
 const router = express.Router();
 const Song = require("../models/song");
 
@@ -48,6 +47,7 @@ router.post("/", (req, res, next) => {
     album: req.body.album,
   });
 
+  // write new song info to the database
   newSong
     .save()
     .then((result) => {
@@ -116,10 +116,21 @@ router.delete("/:songId", (req, res, next) => {
     artist: req.body.artist,
     album: req.body.album,
   };
-  Song.res.json({
-    message: "Song - DELETE",
-    id: songId,
-  });
+  Song.findByIdAndDelete({ _id: songId }, { $set: deleteSong })
+    .then((result) => {
+      console.log(result);
+      res.status(200).json({
+        message: "Song deleted",
+        result,
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        error: {
+          message: err.message,
+        },
+      });
+    });
 });
 
 module.exports = router;

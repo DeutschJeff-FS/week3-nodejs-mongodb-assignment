@@ -39,6 +39,7 @@ app.get("/", (req, res, next) => {
 
 // routes
 app.use("/songs", songRoutes);
+app.use("/artists", artistRoutes);
 
 // error handling middleware
 app.use((req, res, next) => {
