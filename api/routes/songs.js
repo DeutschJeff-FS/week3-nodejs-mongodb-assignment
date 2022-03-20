@@ -9,6 +9,7 @@ router.get("/", (req, res, next) => {
     .then((songList) => {
       // console.log(result);
       res.status(200).json({
+        message: "Song Collection",
         songList,
       });
     })
@@ -52,7 +53,7 @@ router.post("/", (req, res, next) => {
     .save()
     .then((result) => {
       console.log(result);
-      res.status(200).json({
+      res.status(201).json({
         message: "Song submitted",
         result,
         metadata: {
