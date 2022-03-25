@@ -2,13 +2,16 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
 const Song = require("../models/song");
+const Messages = require("../../messages/messages");
 
+//TODO change messages for all
 // GET routes
 router.get("/", (req, res, next) => {
   Song.find({})
     .then((songList) => {
       // console.log(result);
       res.status(200).json({
+        //* message: Messages.[messagesKey]
         message: "Song Collection",
         songList,
       });
@@ -22,6 +25,7 @@ router.get("/", (req, res, next) => {
     });
 });
 
+// TODO add select, populate, exec, and catch methods
 router.get("/:songId", (req, res, next) => {
   const songId = req.params.songId;
 
@@ -40,6 +44,7 @@ router.get("/:songId", (req, res, next) => {
 });
 
 // POST route
+// TODO add validation and methods from GetById
 router.post("/", (req, res, next) => {
   const newSong = new Song({
     _id: mongoose.Types.ObjectId(),
@@ -73,6 +78,8 @@ router.post("/", (req, res, next) => {
 });
 
 // PATCH route
+// TODO add validation and other methods
+// TODO change updateOne to findByIdAndUpdate
 router.patch("/:songId", (req, res, next) => {
   const songId = req.params.songId;
 
@@ -109,6 +116,7 @@ router.patch("/:songId", (req, res, next) => {
 });
 
 // DELETE route
+// TODO add validation and other methods
 router.delete("/:songId", (req, res, next) => {
   const songId = req.params.songId;
 

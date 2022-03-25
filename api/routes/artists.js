@@ -1,6 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const Artist = require("../models/artist");
+const Messages = require("../../messages/messages");
 
+// TODO change messages for all
 // GET routes
 router.get("/", (req, res, next) => {
   res.status(200).json({
