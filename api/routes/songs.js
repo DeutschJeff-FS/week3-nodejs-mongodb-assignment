@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const router = express.Router();
 const Song = require("../models/song");
 const Messages = require("../../messages/messages");
-const { restart } = require("nodemon");
 
 // GET routes
 router.get("/", (req, res, next) => {
@@ -39,6 +38,7 @@ router.get("/:songId", (req, res, next) => {
     .exec()
     .then((song) => {
       console.log(song);
+      // validation to check if song is in collection
       if (!song) {
         res.status(404).json({
           message: Messages.song_not_found,
@@ -108,7 +108,7 @@ router.post("/", (req, res, next) => {
     })
     .catch((err) => {
       console.log(err);
-      restart.status(500).json({
+      res.status(500).json({
         error: {
           message: Messages.song_post_error,
         },
@@ -117,7 +117,6 @@ router.post("/", (req, res, next) => {
 });
 
 // PATCH route
-// TODO add validation and other methods
 router.patch("/:songId", (req, res, next) => {
   const songId = req.params.songId;
 
@@ -163,7 +162,6 @@ router.patch("/:songId", (req, res, next) => {
 });
 
 // DELETE route
-// TODO add validation and other methods
 router.delete("/:songId", (req, res, next) => {
   const songId = req.params.songId;
 
@@ -172,9 +170,11 @@ router.delete("/:songId", (req, res, next) => {
     artist: req.body.artist,
     album: req.body.album,
   };
+
   Song.findByIdAndDelete({ _id: songId }, { $set: deleteSong })
     .exec()
     .then((result) => {
+      // validation to check if song exists in collection
       if (!songId) {
         console.log(result);
         res.status(404).json({
