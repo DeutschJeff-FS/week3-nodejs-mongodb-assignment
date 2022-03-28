@@ -46,6 +46,7 @@ router.get("/:artistId", (req, res, next) => {
         });
       }
       res.status(201).json({
+        message: Messages.artist_found,
         artist,
       });
     })
