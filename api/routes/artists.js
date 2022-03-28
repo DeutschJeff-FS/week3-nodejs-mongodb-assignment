@@ -9,7 +9,6 @@ router.get("/", (req, res, next) => {
   Artist.find({})
     .select("name album _id")
     .exec()
-    //! populate (not included here) does not work as expected regardless of second option or not; receives error of 'cannot populate path "Song" because it is not in your schema. Set the "strictPopulate" option to false to override.'
     .then((artistList) => {
       // validation to check if collection is empty
       if (artistList < 1) {
@@ -34,16 +33,15 @@ router.get("/", (req, res, next) => {
 router.get("/:artistId", (req, res, next) => {
   const artistId = req.params.artistId;
 
-  Artist.findById({ _id: artistId })
+  Artist.findById(artistId)
     .select("name album _id")
-    //! populate does not work as expected regardless of second option or not; receives error of 'cannot populate path "Song" because it is not in your schema. Set the "strictPopulate" option to false to override.'
-    .populate("Song")
+    .populate("song", "title")
     .exec()
     .then((artist) => {
       // validation to check if artist is in collection
       if (!artist) {
         console.log(artist);
-        res.status(404).json({
+        return res.status(404).json({
           message: Messages.artist_not_found,
         });
       }
@@ -62,7 +60,7 @@ router.get("/:artistId", (req, res, next) => {
 
 // POST route
 router.post("/", (req, res, next) => {
-  Artist.find({ name: req.body.name, album: req.body.album })
+  Artist.find({ name: req.body.name, album: req.body.album, song: req.body.song })
     .exec()
     .then((result) => {
       // validation to check if artist is already in database
@@ -77,6 +75,7 @@ router.post("/", (req, res, next) => {
         _id: mongoose.Types.ObjectId(),
         name: req.body.name,
         album: req.body.album,
+        song: req.body.song,
       });
 
       // write new artist info to the database
@@ -89,6 +88,7 @@ router.post("/", (req, res, next) => {
             artist: {
               name: result.name,
               album: result.album,
+              song: result.song,
               id: result._id,
             },
             metadata: {
@@ -123,6 +123,7 @@ router.patch("/:artistId", (req, res, next) => {
   const updateArtist = {
     name: req.body.name,
     album: req.body.album,
+    song: req.body.song,
   };
 
   Artist.findByIdAndUpdate({ _id: artistId }, { $set: updateArtist })
@@ -142,6 +143,7 @@ router.patch("/:artistId", (req, res, next) => {
         result: {
           name: updateArtist.name,
           album: updateArtist.album,
+          song: updateArtist.song,
           id: artistId,
         },
         metadata: {
@@ -166,9 +168,10 @@ router.delete("/:artistId", (req, res, next) => {
   const deleteArtist = {
     name: req.body.name,
     album: req.body.album,
+    song: req.body.song,
   };
 
-  Artist.findByIdAndDelete({ _id: artistId }, { $set, deleteArtist })
+  Artist.findByIdAndDelete({ _id: artistId }, { $set: deleteArtist })
     .exec()
     .then((result) => {
       // validation to check if artist exits in collection

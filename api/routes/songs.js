@@ -45,6 +45,7 @@ router.get("/:songId", (req, res, next) => {
         });
       }
       res.status(200).json({
+        message: Messages.song_selected,
         song,
       });
     })
